@@ -5,11 +5,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using Breakout.Player;
+using Breakout.Manager;
 
 namespace Breakout;
 
-public class Game1 : Game
+public class GameLoop : Game
 {
+    /*
     private Paddle _paddle;
     private Vector2[] _position = new Vector2[3];
     private List<Bricks> _bricks;
@@ -33,34 +36,21 @@ public class Game1 : Game
 
     private bool _victory { get; set; }
     private bool _defeat { get; set; }
+    */
+    private GameManager _gameManager;
 
-    public Game1()
+    public GameLoop()
     {
-        Globals._graphics = new GraphicsDeviceManager(this);
+        Globals.Graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
-    public void Reset()
-    {
-        _paddle.Position = new((Globals.WIDTH / 2) - 30, Globals.HEIGHT / 2);
-        _paddle.Speed = 400f;
-        _ball.ResetBallDirection(new(Globals.WIDTH / 2, (Globals.HEIGHT / 2) + 340));
-        _ball.Speed = 300f;
-        _time = 0;
-        _score = 0;
-        _victory = false;
-        _defeat = false;
-        _bricks = new List<Bricks>();
-        _numBricksBroke = 0;
-        ListBricks();
-    }
-
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-        Globals.Resolution();
         Globals.Content = Content;
+        _gameManager = new();
+        Globals.Resolution();
 
         base.Initialize();
     }
@@ -69,10 +59,7 @@ public class Game1 : Game
     {
         Globals.SpriteBatch = new SpriteBatch(GraphicsDevice);
         Globals.GraphicsDevice = GraphicsDevice;
-
-        Globals.Texture = new(Globals.GraphicsDevice, 1, 1);
-        Globals.Texture.SetData([Color.White]);
-
+        /*
         _position[0] = new(Globals.WIDTH / 20, 32); //EM CIMA
         _position[1] = new((Globals.WIDTH / 5) - 32, (Globals.HEIGHT / 2) - 32); //MEIO
         _position[2] = new((Globals.WIDTH / 5) - 72, (Globals.HEIGHT / 2) - 256);
@@ -88,7 +75,7 @@ public class Game1 : Game
         _font[1] = Content.Load<SpriteFont>("font"); // MEIO
 
         _sound[0] = Content.Load<SoundEffect>("Defeat");
-        _sound[1] = Content.Load<SoundEffect>("Victory");
+        _sound[1] = Content.Load<SoundEffect>("Victory");*/
     }
 
     protected override void Update(GameTime gameTime)
@@ -96,10 +83,8 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        // TODO: Add your update logic here
-        Globals.Update(gameTime);
-        InputManager.Update();
-
+        _gameManager.Update(gameTime);
+        /*
         _paddle.Update();
         _paddle.CheckPaddleBallCollision(_ball);
 
@@ -141,7 +126,7 @@ public class Game1 : Game
         CheckDefeat();
         CheckWin();
         Score();
-        Timer();
+        Timer();*/
 
         base.Update(gameTime);
     }
@@ -149,9 +134,7 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(new Color(08, 00, 35));
-
-        // TODO: Add your drawing code here
-        Globals.SpriteBatch.Begin();
+        /*Globals.SpriteBatch.Begin();
         _paddle.Draw();
         _ball.Draw();
 
@@ -168,11 +151,12 @@ public class Game1 : Game
             Globals.SpriteBatch.DrawString(_font[1], " Voce\nPerdeu", _position[2], Color.Red * 1f);
         }
 
-        Globals.SpriteBatch.End();
+        Globals.SpriteBatch.End();*/
+        _gameManager.Draw();
 
         base.Draw(gameTime);
     }
-
+    /*
     public void ListBricks()
     {
         for (int i = 0; i < Globals.WIDTH / _bricksWidth; i++)
@@ -248,5 +232,5 @@ public class Game1 : Game
         int min = (int)MathF.Floor(_time / 60);
         int sec = (int)MathF.Floor(_time % 60);
         return _timerText = string.Format("{0:00}:{1:00}", min, sec);
-    }
+    }*/
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,9 +10,12 @@ namespace Breakout
         public static SpriteBatch SpriteBatch { get; set; }
         public static GraphicsDevice GraphicsDevice { get; set; }
         public static float Time { get; set; }
-        public const int WIDTH = 600, HEIGHT = 960;
         public static Texture2D Texture { get; set; }
-        public static GraphicsDeviceManager _graphics { get; set; }
+        public static GraphicsDeviceManager Graphics { get; set; }
+        public static Point ScreenResolution;
+        public static int MiddleScreen = ScreenResolution.X / 2;
+        public static int LeftSideWall = MiddleScreen / 2;
+        public static int RightSideWall = MiddleScreen + LeftSideWall;
 
         public static void Update(GameTime gameTime)
         {
@@ -26,10 +24,15 @@ namespace Breakout
 
         public static void Resolution()
         {
-            _graphics.PreferredBackBufferWidth = WIDTH;
-            _graphics.PreferredBackBufferHeight = HEIGHT;
-            _graphics.ApplyChanges();
+            Graphics.PreferredBackBufferWidth = ScreenResolution.X;
+            Graphics.PreferredBackBufferHeight = ScreenResolution.Y;
+            Graphics.ApplyChanges();
         }
 
+        public static void SetResolutionValues(int width, int height)
+        {
+            ScreenResolution.X = width;
+            ScreenResolution.Y = height;
+        }
     }
 }

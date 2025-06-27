@@ -1,2 +1,2 @@
-﻿using var game = new Breakout.Game1();
+﻿using var game = new Breakout.GameLoop();
 game.Run();

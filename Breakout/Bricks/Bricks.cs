@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Breakout.Player;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-namespace Breakout
+namespace Breakout.Bricks
 {
     public class Bricks : DrawableGameComponent
     {
@@ -18,13 +14,13 @@ namespace Breakout
 
         public Bricks(Game game, Vector2 position, Rectangle rect, Color color) : base(game)
         {
-            this.Position = position;
-            this.Rect = rect;
-            this.Color = color;
+            Position = position;
+            Rect = rect;
+            Color = color;
 
-            this._brickSound = Globals.Content.Load<SoundEffect>("Brick_Sound");
+            //_brickSound = Globals.Content.Load<SoundEffect>("Brick_Sound");
         }
-
+        /*
         public bool CheckBallCollision(Ball ball)
         {
             if (Active && ball.Rect.Intersects(Rect))
@@ -35,7 +31,7 @@ namespace Breakout
             }
 
             return false;
-        }
+        }*/
 
         public override void Draw(GameTime gameTime)
         {
