@@ -6,13 +6,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Player
 {
-    public class Ball : Sprite
+    public class Ball : Sprite, IHitable
     {
-        private readonly float _moveSpeed = 210f;
+        private readonly float _moveSpeed = 160f;
         private readonly float _idleSpeed = 300f;
         public bool Run { get; set; } = false;
         public Vector2 Direction;
         private float RotationSpeed { get; set; }
+        public HitboxManager _hitboxManager => new(6, 6, SCALE);
+        public Rectangle HitboxRectangle => new Rectangle
+            ((int)(Position.X - _hitboxManager.RectangleWidthOriginPosition), 
+            (int)(Position.Y - _hitboxManager.RectangleHeightOriginPosition),
+            _hitboxManager.RectangleWidth,
+            _hitboxManager.RectangleHeight);
 
         public Ball(Texture2D texture, Vector2 position) : base(texture, position)
         {
@@ -23,8 +29,11 @@ namespace Breakout.Player
 
         public override void Draw()
         {
-            if (Run) { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, RotationSpeed, OriginPosition, SpriteEffects.None, 1f); }
-            else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, OriginPosition, SpriteEffects.None, 1f); }
+            if (Run) { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
+            else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
+
+            // Ball hitbox.
+            //Globals.SpriteBatch.Draw(_hitboxManager.HitboxTexture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }
 
         public override void Update()
@@ -34,12 +43,16 @@ namespace Breakout.Player
                 RotationSpeed += 0.3f;
                 Position.X += Direction.X * _moveSpeed * Globals.Time;
                 Position.Y -= Direction.Y * _moveSpeed * Globals.Time;
+
+                //Position.X += Direction.X * _moveSpeed * Globals.Time;
+                //Position.Y -= Direction.Y * _moveSpeed * Globals.Time;
+
                 CheckBallCollision();
             }
             else
             {
-                if (InputManager.IsKeyDown(Keys.D) && Position.X < RightSideWall) { Position.X += _idleSpeed * Globals.Time; }
-                if (InputManager.IsKeyDown(Keys.A) && Position.X > LeftSideWall) { Position.X -= _idleSpeed * Globals.Time; }
+                if (InputManager.IsKeyDown(Keys.D) && Position.X < RightSideWall - Texture.Width) { Position.X += _idleSpeed * Globals.Time; }
+                if (InputManager.IsKeyDown(Keys.A) && Position.X > LeftSideWall + Texture.Width) { Position.X -= _idleSpeed * Globals.Time; }
             }
         }
 
@@ -59,7 +72,7 @@ namespace Breakout.Player
         
         public void CheckBallCollision()
         {
-            if (Position.X >= RightSideWall || Position.X <= LeftSideWall) 
+            if (HitboxRectangle.Right >= RightSideWall || HitboxRectangle.Left <= LeftSideWall)
             {
                 Direction.X = -Direction.X;
             }

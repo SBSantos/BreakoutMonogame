@@ -7,10 +7,16 @@ using System.Collections.Generic;
 
 namespace Breakout.Player
 {
-    public class Paddle : Sprite
+    public class Paddle : Sprite, IHitable
     {
         private float _speed = 300f;
         private SoundEffect _paddleSound;
+        private HitboxManager _hitboxManager => new(Texture.Width, 6, SCALE);
+        public Rectangle HitboxRectangle => new Rectangle
+            ((int)(Position.X - _hitboxManager.RectangleWidthOriginPosition), 
+            (int)(Position.Y - _hitboxManager.RectangleHeightOriginPosition), 
+            _hitboxManager.RectangleWidth, 
+            _hitboxManager.RectangleHeight);
 
         public Paddle(Texture2D texture, Vector2 position) : base(texture, position)
         {
@@ -21,22 +27,31 @@ namespace Breakout.Player
         
         public void CheckPaddleBallCollision(Ball ball)
         {
-            if (ball.Rectangle.Intersects(Rectangle))
+            if (ball.HitboxRectangle.Intersects(HitboxRectangle))
             {
                 //_paddleSound.Play();
-                ball.Direction.Y *= -ball.Direction.Y;
+                ball.Direction.Y = -ball.Direction.Y;
             }
         }
 
         public override void Draw()
         {
             base.Draw();
+
+            // Paddle hitbox.
+            //Globals.SpriteBatch.Draw(_hitboxManager.HitboxTexture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }
 
         public override void Update()
         {
-            if (InputManager.IsKeyDown(Keys.A) && Position.X > LeftSideWall) { Position.X -= _speed * Globals.Time; }
-            if (InputManager.IsKeyDown(Keys.D) && Position.X < RightSideWall) { Position.X += _speed * Globals.Time; }
+            if (InputManager.IsKeyDown(Keys.A) && HitboxRectangle.Left > LeftSideWall)
+            { 
+                Position.X -= _speed * Globals.Time;
+            }
+            if (InputManager.IsKeyDown(Keys.D) && HitboxRectangle.Right < RightSideWall)
+            { 
+                Position.X += _speed * Globals.Time; 
+            }
         }
     }
 }

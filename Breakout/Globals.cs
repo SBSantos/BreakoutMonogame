@@ -13,9 +13,6 @@ namespace Breakout
         public static Texture2D Texture { get; set; }
         public static GraphicsDeviceManager Graphics { get; set; }
         public static Point ScreenResolution;
-        public static int MiddleScreen = ScreenResolution.X / 2;
-        public static int LeftSideWall = MiddleScreen / 2;
-        public static int RightSideWall = MiddleScreen + LeftSideWall;
 
         public static void Update(GameTime gameTime)
         {
