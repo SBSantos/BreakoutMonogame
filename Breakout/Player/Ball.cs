@@ -6,19 +6,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Player
 {
-    public class Ball : Sprite, IHitable
+    public class Ball : Sprite
     {
         private readonly float _moveSpeed = 160f;
         private readonly float _idleSpeed = 300f;
         public bool Run { get; set; } = false;
         public Vector2 Direction;
         private float RotationSpeed { get; set; }
-        public HitboxManager _hitboxManager => new(6, 6, SCALE);
-        public Rectangle HitboxRectangle => new Rectangle
-            ((int)(Position.X - _hitboxManager.RectangleWidthOriginPosition), 
-            (int)(Position.Y - _hitboxManager.RectangleHeightOriginPosition),
-            _hitboxManager.RectangleWidth,
-            _hitboxManager.RectangleHeight);
+        public HitboxManager HitboxManager => new(Position, 6, 6, SCALE);
 
         public Ball(Texture2D texture, Vector2 position) : base(texture, position)
         {
@@ -29,11 +24,18 @@ namespace Breakout.Player
 
         public override void Draw()
         {
-            if (Run) { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
+            if (Run) 
+            { 
+                // Same shit but removing the origin position in the X and Y position of the rectangle and setting the vector2 origin parameter in the middle.
+                // Now the rotation is working! :D
+
+                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X, (int)Position.Y, Texture.Width * SCALE, Texture.Height * SCALE),
+                    null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 1f); 
+            }
             else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
 
             // Ball hitbox.
-            //Globals.SpriteBatch.Draw(_hitboxManager.HitboxTexture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            //Globals.SpriteBatch.Draw(HitboxManager.HitboxTexture, HitboxManager.HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }
 
         public override void Update()
@@ -72,7 +74,7 @@ namespace Breakout.Player
         
         public void CheckBallCollision()
         {
-            if (HitboxRectangle.Right >= RightSideWall || HitboxRectangle.Left <= LeftSideWall)
+            if (HitboxManager.HitboxRectangle.Right >= RightSideWall || HitboxManager.HitboxRectangle.Left <= LeftSideWall)
             {
                 Direction.X = -Direction.X;
             }

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Manager
 {
-    public class Sprite
+    public abstract class Sprite
     {
         /// <summary>
         /// Texture of the sprite.
@@ -19,7 +19,7 @@ namespace Breakout.Manager
         /// <summary>
         /// Set the sprite origin position in the middle of the texture, not on the left side.
         /// </summary>
-        public Vector2 OriginPosition => new Vector2((Texture.Width / 2) * SCALE, (Texture.Height / 2) * SCALE);
+        public Vector2 OriginPosition => new Vector2(Texture.Width, Texture.Height);
 
         /// <summary>
         /// Rectangle of the sprite.

@@ -5,7 +5,7 @@ namespace Breakout.Manager
     public static class InputManager
     {
         private static KeyboardState _lastKB;
-        public static bool SpacePressed { get; set; }//Evita o loop quando determinada tecla é pressionada apenas uma vez
+        public static bool SpacePressed { get; set; }
         public static bool RPressed { get; private set; }
 
 
@@ -19,7 +19,6 @@ namespace Breakout.Manager
             var kb = Keyboard.GetState();
             SpacePressed = kb.IsKeyDown(Keys.Space) && _lastKB.IsKeyUp(Keys.Space);
             RPressed = kb.IsKeyDown(Keys.R) && _lastKB.IsKeyUp(Keys.R);
-            //IsKeyUp é a linha que evita o loop. (Obs: "X" em "Keys.X" refere-se a qualquer tecla, mude para a que desejar)
             _lastKB = kb;
         }
     }

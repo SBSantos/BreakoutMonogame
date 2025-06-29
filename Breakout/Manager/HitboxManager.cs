@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Manager
 {
-    public class HitboxManager
+    public class HitboxManager : IHitable
     {
         /// <summary>
         /// Texture of the hitbox.
@@ -30,16 +30,23 @@ namespace Breakout.Manager
         /// </summary>
         public int RectangleHeightOriginPosition { get; set; }
 
-        public HitboxManager(int rectangleWidth, int rectangleHeight, int scale)
+        public Rectangle HitboxRectangle { get; }
+        public Vector2 Position { get; }
+
+        public HitboxManager(Vector2 position, int rectangleWidth, int rectangleHeight, int scale)
         {
             HitboxTexture = new Texture2D(Globals.GraphicsDevice, 1, 1);
             HitboxTexture.SetData([new Color(Color.Red, 0.1f)]);
+
+            Position = position;
 
             RectangleWidth = rectangleWidth * scale;
             RectangleHeight = rectangleHeight * scale;
 
             RectangleWidthOriginPosition = (rectangleWidth / 2) * scale;
-            RectangleHeightOriginPosition = (rectangleHeight / 2 * scale);
+            RectangleHeightOriginPosition = (rectangleHeight / 2) * scale;
+
+            HitboxRectangle = new Rectangle((int)(Position.X - RectangleWidthOriginPosition), (int)(Position.Y - RectangleHeightOriginPosition), RectangleWidth, RectangleHeight);
         }
     }
 }
