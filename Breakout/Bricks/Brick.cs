@@ -6,26 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Bricks
 {
-    public abstract class Brick :  Sprite
+    public class Brick : Sprite
     {
-        /// <summary>
-        /// The spritesheet texture of the bricks gets big asf if I use the Sprite class rectangle so I created this rectangle to make it smaller.
-        /// </summary>
-        public Rectangle BrickRectangle => new Rectangle((int)(Position.X - SrcRectangle.Width), (int)(Position.Y - SrcRectangle.Height), SrcRectangle.Width * SCALE, SrcRectangle.Height * SCALE);
-
-        /// <summary>
-        /// Source rectangle for a especified texture.
-        /// </summary>
-        public Rectangle SrcRectangle { get; set; }
-
-        /// <summary>
-        /// Hitbox of the brick.
-        /// </summary>
-        public HitboxManager HitboxManager => new(Position, 20, 8, SCALE);
-
-        /// <summary>
-        /// Sound.
-        /// </summary>
+        public Texture2D BrickTexture;
+        public bool Active { get; set; } = false;
+        private readonly int _widthOffset = 40;
+        private readonly int _heightOffset = 16;
+        public Rectangle HitboxRectangle => new Rectangle((int)(Position.X + _widthOffset / 3), (int)(Position.Y + Texture.Height - _heightOffset / 2), _widthOffset, _heightOffset);
         private SoundEffect _brickSound;
 
         public Brick(Texture2D texture, Vector2 position) : base(texture, position)
@@ -34,16 +21,17 @@ namespace Breakout.Bricks
             Position = position;
         }
 
-        public virtual bool CheckBallCollision(Ball ball)
+        public override void Draw()
         {
-            if (ball.HitboxManager.HitboxRectangle.Intersects(HitboxManager.HitboxRectangle))
+            if (!Active)
             {
-                //_brickSound.Play();
-                ball.Direction.Y = -ball.Direction.Y;
-                return true;
-            }
+                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
-            return false;
+                // Brick hitbox
+                //BrickTexture = new Texture2D(Globals.GraphicsDevice, 1, 1);
+                //BrickTexture.SetData([new Color(Color.Red, 0.1f)]);
+                //Globals.SpriteBatch.Draw(BrickTexture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            }
         }
     }
 }

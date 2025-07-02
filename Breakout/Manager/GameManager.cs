@@ -3,53 +3,76 @@ using Breakout.Bricks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Globalization;
+using System;
 
 namespace Breakout.Manager
 {
-    class GameManager
+    public class GameManager
     {
         private Texture2D Texture { get; }
+        private Texture2D _lineTexture;
         private readonly Paddle _paddle;
         private readonly Ball _ball;
-        private readonly HashSet<Brick> _brick;
+        private readonly Map _map;
+        private readonly SpriteFont _font;
+        private float _time;
+        public bool Victory { get; set; }
+        public bool Defeat { get; set; }
         private readonly Rectangle[] _line = new Rectangle[3];
-        private Texture2D _lineTexture;
+        public int MiddleX => Globals.ScreenResolution.X / 2;
+        public int LeftX => MiddleX / 2;
+        public int RightX => LeftX + MiddleX;
+        public int TextureOffset = 32;
 
         public GameManager()
         {
             Globals.SetResolutionValues(640, 480);
+            _map = new();
 
-            _paddle = new(Texture, new Vector2(Globals.ScreenResolution.X / 2, (Globals.ScreenResolution.Y / 2) * 1.8f));
+            _paddle = new(Texture, new Vector2(MiddleX - TextureOffset, (Globals.ScreenResolution.Y / 2) * 1.7f));
 
             var ballYPos = _paddle.Position.Y - (_paddle.Texture.Height / 3) - 2;
-            _ball = new(Texture, new Vector2(Globals.ScreenResolution.X / 2, ballYPos));
+            _ball = new(Texture, new Vector2(MiddleX - TextureOffset, ballYPos));
 
-            _brick = new();
-            SetBrick();
+            _font = Globals.Content.Load<SpriteFont>("Font/Font");
 
-            // Line that draw the middle, left and right walls.
-            var middle = Globals.ScreenResolution.X / 2;
-            var left = middle / 2;
-            var right = left + middle;
-            _line[0] = new Rectangle(middle, 0, 1, 1000);
-            _line[1] = new Rectangle(left, 0, 1, 1000);
-            _line[2] = new Rectangle(right, 0, 1, 1000);
+            Victory = false;
+            Defeat = false;
+
+            _line[0] = new(LeftX, 0, 1, 1000);
+            _line[1] = new(MiddleX, 0, 1, 1000);
+            _line[2] = new(RightX, 0, 1, 1000);
         }
 
         public void Draw()
         {
             Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _paddle.Draw();
-            _ball.Draw();
-            
-            foreach (var brick in _brick) { brick.Draw(); }
+
+            if (!Defeat) { _ball.Draw(); }
+
+            _map.Draw();
+
+            Globals.SpriteBatch.DrawString(_font, GameScore(_ball), new Vector2(LeftX + 10, 0), Color.White);
+            Globals.SpriteBatch.DrawString(_font, Timer(_ball), new Vector2(MiddleX - (MiddleX / 4) + 16, Globals.ScreenResolution.Y / 2), Color.White);
+
+            ShowLife(_ball);
+
+            if (_map.CheckWin(this))
+            {
+                Globals.SpriteBatch.DrawString(_font, "You Win!", new Vector2(MiddleX - (MiddleX / 4) + 28, (Globals.ScreenResolution.Y / 2) + 20), Color.Green);
+            }
+            if (_ball.CheckDefeat(this))
+            {
+                Globals.SpriteBatch.DrawString(_font, "You Lose!", new Vector2(MiddleX - (MiddleX / 4) + 28, (Globals.ScreenResolution.Y / 2) + 20), Color.Red);
+            }
 
             _lineTexture = new Texture2D(Globals.GraphicsDevice, 1, 1);
             _lineTexture.SetData([Color.White]);
-            //Globals.SpriteBatch.Draw(_lineTexture, _line[0], Color.White);
-            Globals.SpriteBatch.Draw(_lineTexture, _line[1], Color.White);
+            Globals.SpriteBatch.Draw(_lineTexture, _line[0], Color.White);
+            //Globals.SpriteBatch.Draw(_lineTexture, _line[1], Color.White);
             Globals.SpriteBatch.Draw(_lineTexture, _line[2], Color.White);
-
             Globals.SpriteBatch.End();
         }
 
@@ -60,53 +83,82 @@ namespace Breakout.Manager
             InputManager.Update();
             _paddle.Update();
             _ball.Update();
+            _ball.CheckWallCollision(_ball);
             _paddle.CheckPaddleBallCollision(_ball);
-            
-            foreach (var brick in _brick)
+            _map.CheckBrickCollision(_ball);
+
+            if (_ball.CheckBallOutsideOfTheScreen()) { _ball.NewLive(_paddle, _ball, this); }
+
+            //_ball.CheckPlayerLives(this);
+
+            if (InputManager.SpacePressed && !_ball.Run) 
+            { 
+                _ball.Run = true;
+                _ball.RunTimer = true;
+            }
+            else { _ball.MoveSpeed = 300f; }
+
+            _map.CheckWin(this);
+            _ball.CheckDefeat(this);
+            if (Victory || Defeat)
             {
-                if (brick.CheckBallCollision(_ball))
-                {
-                    _brick.Remove(brick);
+                _paddle.Speed = 0f;
+                _ball.MoveSpeed = 0f;
+                _ball.Direction.X = 0f;
+                _ball.Direction.Y = 0f;
+
+                if (InputManager.RPressed) 
+                { 
+                    Reset(_ball, _map);
                 }
             }
-
-            if (InputManager.SpacePressed && !_ball.Run) { _ball.Run = true; }
-
-            if (InputManager.RPressed) { Reset(); }
         }
 
-        public void Reset()
+        public void Reset(Ball ball, Map map)
         {
             var ballYPos = _paddle.Position.Y - (_paddle.Texture.Height / 3) - 2;
-            _paddle.Position = new(Globals.ScreenResolution.X / 2, (Globals.ScreenResolution.Y / 2) * 1.8f);
-            _ball.ResetBallDirection(new(Globals.ScreenResolution.X / 2, ballYPos));
-            //_paddle.Speed = 400f;
-            //_ball.ResetBallDirection(new(Globals.WIDTH / 2, (Globals.HEIGHT / 2) + 340));
-            //_ball.Speed = 300f;
-            //_time = 0;
-            //_score = 0;
-            //_victory = false;
-            //_defeat = false;
+            _paddle.Position = new(MiddleX - TextureOffset, (Globals.ScreenResolution.Y / 2) * 1.7f);
+            _ball.ResetBallDirection(new(MiddleX - TextureOffset, ballYPos));
+            _paddle.Speed = 300f;
+            _ball.MoveSpeed = 300f;
+            _time = 0;
+            ball.Score = 0;
+            ball.NumberBricksBroken = 0;
+            Victory = false;
+            Defeat = false;
             //_bricks = new List<Bricks>();
-            //_numBricksBroke = 0;
             //ListBricks();
         }
 
-        public void AddBrick(Brick brick)
+        public string GameScore(Ball ball)
         {
-            _brick.Add(brick);
+            return string.Format("Score:{0}", ball.Score);
         }
 
-        public void SetBrick()
+        public string Timer(Ball ball)
         {
-            var middle = Globals.ScreenResolution.X / 2;
-            var left = middle / 2;
-            var right = left + middle;
+            var second = 0f;
+            var minutes = 0f;
 
-            // Yelow Bricks
-            for (int i = 0; i < 8; i++) { AddBrick(new YellowBrick(Texture, new Vector2((left / 4 * i) + (left + 20), 50))); }
+            if (ball.RunTimer)
+            {
+                _time += Globals.Time;
+                second = (float)Math.Floor(_time % 60);
+                minutes = (float)Math.Floor(_time / 60);
+                return string.Format("Time:{0:00}:{1:00}", minutes, second);
+            }
+            return string.Format("Time:{0:00}:{1:00}", minutes, second);
+        }
 
-            //
+        public SpriteBatch ShowLife(Ball ball)
+        {
+            Globals.SpriteBatch.DrawString(_font, "Lives:", new Vector2(MiddleX + 10, 0), Color.White);
+            for (int i = 0; i < ball.Lives; i++)
+            {
+                var Size = 24 * i;
+                Globals.SpriteBatch.Draw(ball.Texture, new Rectangle((MiddleX + LeftX / 2) + Size - 16, -24, ball.Texture.Width * 2, ball.Texture.Height * 2), Color.White);
+            }
+            return null;
         }
     }
 }

@@ -3,58 +3,61 @@ using Breakout.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Breakout.Bricks;
+using System.Reflection.Metadata;
 
 namespace Breakout.Player
 {
     public class Ball : Sprite
     {
-        private readonly float _moveSpeed = 160f;
-        private readonly float _idleSpeed = 300f;
+        public float MoveSpeed;
         public bool Run { get; set; } = false;
+        public bool RunTimer;
+        public int Score { get; set; }
+        public int Lives { get; set; }
+        public int NumberBricksBroken { get; set; }
         public Vector2 Direction;
         private float RotationSpeed { get; set; }
-        public HitboxManager HitboxManager => new(Position, 6, 6, SCALE);
+        private const int OFFSET = 4;
 
         public Ball(Texture2D texture, Vector2 position) : base(texture, position)
         {
             Texture = Globals.Content.Load<Texture2D>("Textures/Ball");
             Position = position;
+            RunTimer = false;
+            Score = 0;
+            Lives = 3;
+            NumberBricksBroken = 0;
             ResetBallDirection(Position);
         }
 
         public override void Draw()
         {
+            
             if (Run) 
             { 
                 // Same shit but removing the origin position in the X and Y position of the rectangle and setting the vector2 origin parameter in the middle.
                 // Now the rotation is working! :D
+                // Update: Not working anymore :(
 
-                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X, (int)Position.Y, Texture.Width * SCALE, Texture.Height * SCALE),
-                    null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 1f); 
+                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); 
             }
             else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
-
-            // Ball hitbox.
-            //Globals.SpriteBatch.Draw(HitboxManager.HitboxTexture, HitboxManager.HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }
 
         public override void Update()
         {
             if (Run)
             {
+                MoveSpeed = 160f;
                 RotationSpeed += 0.3f;
-                Position.X += Direction.X * _moveSpeed * Globals.Time;
-                Position.Y -= Direction.Y * _moveSpeed * Globals.Time;
-
-                //Position.X += Direction.X * _moveSpeed * Globals.Time;
-                //Position.Y -= Direction.Y * _moveSpeed * Globals.Time;
-
-                CheckBallCollision();
+                Position.X += Direction.X * MoveSpeed * Globals.Time;
+                Position.Y -= Direction.Y * MoveSpeed * Globals.Time;
             }
             else
             {
-                if (InputManager.IsKeyDown(Keys.D) && Position.X < RightSideWall - Texture.Width) { Position.X += _idleSpeed * Globals.Time; }
-                if (InputManager.IsKeyDown(Keys.A) && Position.X > LeftSideWall + Texture.Width) { Position.X -= _idleSpeed * Globals.Time; }
+                if (InputManager.IsKeyDown(Keys.D) && Position.X < RightSideWall - Texture.Width * SCALE) { Position.X += MoveSpeed * Globals.Time; }
+                if (InputManager.IsKeyDown(Keys.A) && Position.X > LeftSideWall) { Position.X -= MoveSpeed * Globals.Time; }
             }
         }
 
@@ -71,17 +74,55 @@ namespace Breakout.Player
 
             Direction.Y = 1;
         }
-        
-        public void CheckBallCollision()
+
+        public void CheckWallCollision(Ball ball)
         {
-            if (HitboxManager.HitboxRectangle.Right >= RightSideWall || HitboxManager.HitboxRectangle.Left <= LeftSideWall)
+            var newRect = ball.CalculateBound(ball.Position);
+            if (newRect.Right >= ball.RightSideWall || newRect.Left <= ball.LeftSideWall)
             {
-                Direction.X = -Direction.X;
+                ball.Direction.X = -ball.Direction.X;
             }
-            if (Position.Y < 0)
+            if (ball.Position.Y < 0)
             {
-                Direction.Y = -Direction.Y;
+                ball.Direction.Y = -ball.Direction.Y;
             }
+        }
+
+        public Rectangle CalculateBound(Vector2 pos)
+        {
+            return new Rectangle((int)(pos.X + Texture.Width - OFFSET), (int)(pos.Y + Texture.Height - OFFSET), OFFSET * SCALE, OFFSET * SCALE);
+        }
+
+        public bool CheckBallOutsideOfTheScreen()
+        {
+            if (Position.Y > Globals.ScreenResolution.Y) 
+            {
+                Lives--;
+                return true;
+            }
+            return false;
+        }
+
+        public void NewLive(Paddle paddle, Ball ball, GameManager gameManager)
+        {
+            ball.Run = false;
+            paddle.Position = new(gameManager.MiddleX - gameManager.TextureOffset, (Globals.ScreenResolution.Y / 2) * 1.7f);
+
+            if (gameManager.Defeat)
+            {
+
+            }
+            else
+            {
+                var ballYPos = paddle.Position.Y - (paddle.Texture.Height / 3) - 2;
+                ball.ResetBallDirection(new(gameManager.MiddleX - gameManager.TextureOffset, ballYPos));
+            }
+        }
+
+        public bool CheckDefeat(GameManager gameManager)
+        {
+            if (Lives == 0) { return gameManager.Defeat = true; }
+            return false;
         }
     }
 }

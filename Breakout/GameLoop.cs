@@ -44,6 +44,7 @@ public class GameLoop : Game
         Globals.Graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()

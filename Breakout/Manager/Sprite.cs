@@ -17,14 +17,9 @@ namespace Breakout.Manager
         public Vector2 Position;
 
         /// <summary>
-        /// Set the sprite origin position in the middle of the texture, not on the left side.
-        /// </summary>
-        public Vector2 OriginPosition => new Vector2(Texture.Width, Texture.Height);
-
-        /// <summary>
         /// Rectangle of the sprite.
         /// </summary>
-        public Rectangle Rectangle => new Rectangle((int)(Position.X - OriginPosition.X), (int)(Position.Y - OriginPosition.Y), Texture.Width * SCALE, Texture.Height * SCALE);
+        public Rectangle Rectangle => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width * SCALE, Texture.Height * SCALE);
 
         /// <summary>
         /// Stores the middle of the screen.

@@ -9,9 +9,10 @@ namespace Breakout.Player
 {
     public class Paddle : Sprite
     {
-        private readonly float _speed = 300f;
+        public float Speed = 300f;
         private readonly SoundEffect _paddleSound;
-        public HitboxManager HitboxManager => new(Position, Texture.Width, 6, SCALE);
+        private readonly int HeightOffset = 12;
+        public Rectangle HitboxRectangle => new Rectangle((int)Position.X, (int)Position.Y + Texture.Height - HeightOffset / 2, Texture.Width * 2, HeightOffset);
 
         public Paddle(Texture2D texture, Vector2 position) : base(texture, position)
         {
@@ -22,7 +23,8 @@ namespace Breakout.Player
         
         public void CheckPaddleBallCollision(Ball ball)
         {
-            if (ball.HitboxManager.HitboxRectangle.Intersects(HitboxManager.HitboxRectangle))
+            var newRect = ball.CalculateBound(ball.Position);
+            if (newRect.Intersects(HitboxRectangle))
             {
                 //_paddleSound.Play();
                 ball.Direction.Y = -ball.Direction.Y;
@@ -34,18 +36,20 @@ namespace Breakout.Player
             base.Draw();
 
             // Paddle hitbox.
-            //Globals.SpriteBatch.Draw(HitboxManager.HitboxTexture, HitboxManager.HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            //var Texture = new Texture2D(Globals.GraphicsDevice, 1, 1);
+            //Texture.SetData([new Color(Color.Red, 0.1f)]);
+            //Globals.SpriteBatch.Draw(Texture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
         }
 
         public override void Update()
         {
-            if (InputManager.IsKeyDown(Keys.A) && HitboxManager.HitboxRectangle.Left > LeftSideWall)
+            if (InputManager.IsKeyDown(Keys.A) && HitboxRectangle.Left > LeftSideWall)
             { 
-                Position.X -= _speed * Globals.Time;
+                Position.X -= Speed * Globals.Time;
             }
-            if (InputManager.IsKeyDown(Keys.D) && HitboxManager.HitboxRectangle.Right < RightSideWall)
+            if (InputManager.IsKeyDown(Keys.D) && HitboxRectangle.Right < RightSideWall)
             { 
-                Position.X += _speed * Globals.Time; 
+                Position.X += Speed * Globals.Time; 
             }
         }
     }
