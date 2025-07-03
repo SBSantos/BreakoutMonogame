@@ -3,11 +3,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 
 namespace Breakout.Player
 {
-    public class Paddle : Sprite
+    public class Paddle : Sprite, IHitable
     {
         public float Speed = 300f;
         private readonly SoundEffect _paddleSound;

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Bricks
 {
-    public class Brick : Sprite
+    public class Brick : Sprite, IHitable
     {
         public Texture2D BrickTexture;
         public bool Active { get; set; } = false;

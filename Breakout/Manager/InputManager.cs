@@ -5,8 +5,8 @@ namespace Breakout.Manager
     public static class InputManager
     {
         private static KeyboardState _lastKB;
-        public static bool SpacePressed { get; set; }
-        public static bool RPressed { get; private set; }
+        public static bool SpacePressed { get; set; } // To Release the ball
+        public static bool RPressed { get; private set; } // To restart the game
 
 
         public static bool IsKeyDown(Keys key)

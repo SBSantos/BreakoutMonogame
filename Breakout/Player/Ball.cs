@@ -3,8 +3,6 @@ using Breakout.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using Breakout.Bricks;
-using System.Reflection.Metadata;
 
 namespace Breakout.Player
 {
@@ -17,7 +15,7 @@ namespace Breakout.Player
         public int Lives { get; set; }
         public int NumberBricksBroken { get; set; }
         public Vector2 Direction;
-        private float RotationSpeed { get; set; }
+        public float RotationSpeed { get; set; }
         private const int OFFSET = 4;
 
         public Ball(Texture2D texture, Vector2 position) : base(texture, position)
@@ -36,11 +34,9 @@ namespace Breakout.Player
             
             if (Run) 
             { 
-                // Same shit but removing the origin position in the X and Y position of the rectangle and setting the vector2 origin parameter in the middle.
-                // Now the rotation is working! :D
-                // Update: Not working anymore :(
-
-                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); 
+                // Pos X and Y += Texture divided by 2 + Ball sprite + offset (12 + 4);
+                // Now it's working 100%, for sure! :D
+                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width * SCALE, Texture.Height * SCALE), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 1f); 
             }
             else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
         }
@@ -103,20 +99,12 @@ namespace Breakout.Player
             return false;
         }
 
-        public void NewLive(Paddle paddle, Ball ball, GameManager gameManager)
+        public void NewLive(Paddle paddle, GameManager gameManager)
         {
-            ball.Run = false;
+            Run = false;
             paddle.Position = new(gameManager.MiddleX - gameManager.TextureOffset, (Globals.ScreenResolution.Y / 2) * 1.7f);
-
-            if (gameManager.Defeat)
-            {
-
-            }
-            else
-            {
-                var ballYPos = paddle.Position.Y - (paddle.Texture.Height / 3) - 2;
-                ball.ResetBallDirection(new(gameManager.MiddleX - gameManager.TextureOffset, ballYPos));
-            }
+            var ballYPos = paddle.Position.Y - (paddle.Texture.Height / 3) - 2;
+            ResetBallDirection(new(gameManager.MiddleX - gameManager.TextureOffset, ballYPos));
         }
 
         public bool CheckDefeat(GameManager gameManager)

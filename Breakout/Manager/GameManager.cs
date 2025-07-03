@@ -2,8 +2,6 @@
 using Breakout.Bricks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Globalization;
 using System;
 
 namespace Breakout.Manager
@@ -17,6 +15,8 @@ namespace Breakout.Manager
         private readonly Map _map;
         private readonly SpriteFont _font;
         private float _time;
+        private float _seconds = 0f;
+        private float _minutes = 0f;
         public bool Victory { get; set; }
         public bool Defeat { get; set; }
         private readonly Rectangle[] _line = new Rectangle[3];
@@ -54,20 +54,9 @@ namespace Breakout.Manager
 
             _map.Draw();
 
-            Globals.SpriteBatch.DrawString(_font, GameScore(_ball), new Vector2(LeftX + 10, 0), Color.White);
-            Globals.SpriteBatch.DrawString(_font, Timer(_ball), new Vector2(MiddleX - (MiddleX / 4) + 16, Globals.ScreenResolution.Y / 2), Color.White);
-
-            ShowLife(_ball);
-
-            if (_map.CheckWin(this))
-            {
-                Globals.SpriteBatch.DrawString(_font, "You Win!", new Vector2(MiddleX - (MiddleX / 4) + 28, (Globals.ScreenResolution.Y / 2) + 20), Color.Green);
-            }
-            if (_ball.CheckDefeat(this))
-            {
-                Globals.SpriteBatch.DrawString(_font, "You Lose!", new Vector2(MiddleX - (MiddleX / 4) + 28, (Globals.ScreenResolution.Y / 2) + 20), Color.Red);
-            }
-
+            ShowGameInterface();
+            GameResult();
+            
             _lineTexture = new Texture2D(Globals.GraphicsDevice, 1, 1);
             _lineTexture.SetData([Color.White]);
             Globals.SpriteBatch.Draw(_lineTexture, _line[0], Color.White);
@@ -87,9 +76,7 @@ namespace Breakout.Manager
             _paddle.CheckPaddleBallCollision(_ball);
             _map.CheckBrickCollision(_ball);
 
-            if (_ball.CheckBallOutsideOfTheScreen()) { _ball.NewLive(_paddle, _ball, this); }
-
-            //_ball.CheckPlayerLives(this);
+            if (_ball.CheckBallOutsideOfTheScreen()) { _ball.NewLive(_paddle, this); }
 
             if (InputManager.SpacePressed && !_ball.Run) 
             { 
@@ -98,23 +85,20 @@ namespace Breakout.Manager
             }
             else { _ball.MoveSpeed = 300f; }
 
-            _map.CheckWin(this);
-            _ball.CheckDefeat(this);
-            if (Victory || Defeat)
+            if (_map.CheckWin(this) || _ball.CheckDefeat(this))
             {
                 _paddle.Speed = 0f;
                 _ball.MoveSpeed = 0f;
+                _ball.RotationSpeed = 0f;
                 _ball.Direction.X = 0f;
                 _ball.Direction.Y = 0f;
+                _ball.RunTimer = false;
 
-                if (InputManager.RPressed) 
-                { 
-                    Reset(_ball, _map);
-                }
+                if (InputManager.RPressed) { Reset(); }
             }
         }
 
-        public void Reset(Ball ball, Map map)
+        public void Reset()
         {
             var ballYPos = _paddle.Position.Y - (_paddle.Texture.Height / 3) - 2;
             _paddle.Position = new(MiddleX - TextureOffset, (Globals.ScreenResolution.Y / 2) * 1.7f);
@@ -122,41 +106,62 @@ namespace Breakout.Manager
             _paddle.Speed = 300f;
             _ball.MoveSpeed = 300f;
             _time = 0;
-            ball.Score = 0;
-            ball.NumberBricksBroken = 0;
+            _seconds = 0f;
+            _minutes = 0f;
+            _ball.Score = 0;
+            _ball.NumberBricksBroken = 0;
+            _ball.Run = false;
+            _ball.Lives = 3;
             Victory = false;
             Defeat = false;
-            //_bricks = new List<Bricks>();
-            //ListBricks();
+            _map.ResetBrick();
         }
 
-        public string GameScore(Ball ball)
+        public string GameScore()
         {
-            return string.Format("Score:{0}", ball.Score);
+            return string.Format("Score:{0}", _ball.Score);
         }
 
-        public string Timer(Ball ball)
+        public string Timer()
         {
-            var second = 0f;
-            var minutes = 0f;
-
-            if (ball.RunTimer)
+            if (_ball.RunTimer)
             {
                 _time += Globals.Time;
-                second = (float)Math.Floor(_time % 60);
-                minutes = (float)Math.Floor(_time / 60);
-                return string.Format("Time:{0:00}:{1:00}", minutes, second);
+                _seconds = (float)Math.Floor(_time % 60);
+                _minutes = (float)Math.Floor(_time / 60);
+                return string.Format("Time:{0:00}:{1:00}", _minutes, _seconds);
             }
-            return string.Format("Time:{0:00}:{1:00}", minutes, second);
+            return string.Format("Time:{0:00}:{1:00}", _minutes, _seconds);
         }
 
-        public SpriteBatch ShowLife(Ball ball)
+        public SpriteBatch ShowGameInterface()
         {
-            Globals.SpriteBatch.DrawString(_font, "Lives:", new Vector2(MiddleX + 10, 0), Color.White);
-            for (int i = 0; i < ball.Lives; i++)
+            Globals.SpriteBatch.DrawString(_font, GameScore(), new Vector2(LeftX + 10, 4), Color.White);
+            Globals.SpriteBatch.DrawString(_font, Timer(), new Vector2(MiddleX - (MiddleX / 4) + 24, Globals.ScreenResolution.Y / 2), Color.White);
+            Globals.SpriteBatch.DrawString(_font, "Lives:", new Vector2(MiddleX + 10, 4), Color.White);
+
+            for (int i = 0; i < _ball.Lives; i++)
             {
                 var Size = 24 * i;
-                Globals.SpriteBatch.Draw(ball.Texture, new Rectangle((MiddleX + LeftX / 2) + Size - 16, -24, ball.Texture.Width * 2, ball.Texture.Height * 2), Color.White);
+                Globals.SpriteBatch.Draw(_ball.Texture, new Rectangle((MiddleX + LeftX / 2) + Size - 22, -22, _ball.Texture.Width * 2, _ball.Texture.Height * 2), Color.White);
+            }
+            return null;
+        }
+
+        public SpriteBatch GameResult()
+        {
+            var newFont = _font;
+            if (_map.CheckWin(this))
+            {
+                Globals.SpriteBatch.DrawString(_font, "You Win!", new Vector2(MiddleX - (MiddleX / 4) + 38, (Globals.ScreenResolution.Y / 2) + 20), Color.Green);
+            }
+            if (_ball.CheckDefeat(this))
+            {
+                Globals.SpriteBatch.DrawString(_font, "You Lose!", new Vector2(MiddleX - (MiddleX / 4) + 32, (Globals.ScreenResolution.Y / 2) + 20), Color.Red);
+            }
+            if (_map.CheckWin(this) || _ball.CheckDefeat(this))
+            {
+                Globals.SpriteBatch.DrawString(_font, "Press R to restart the game", new Vector2(MiddleX - LeftX + 18, (Globals.ScreenResolution.Y / 2) + 40), Color.White);
             }
             return null;
         }
