@@ -42,14 +42,16 @@ namespace Breakout.Player
 
         public override void Update()
         {
-            if (InputManager.IsKeyDown(Keys.A) && HitboxRectangle.Left > LeftSideWall)
+            if (InputManager.IsKeyDown(Keys.A) || InputManager.IsKeyDown(Keys.Left))
             { 
                 Position.X -= Speed * Globals.Time;
             }
-            if (InputManager.IsKeyDown(Keys.D) && HitboxRectangle.Right < RightSideWall)
+            if (InputManager.IsKeyDown(Keys.D) || InputManager.IsKeyDown(Keys.Right))
             { 
                 Position.X += Speed * Globals.Time; 
             }
+
+            Position = Vector2.Clamp(Position, new Vector2(LeftSideWall, 0), new(RightSideWall - Texture.Width * SCALE, (Globals.ScreenResolution.Y / 2) * 1.7f));
         }
     }
 }

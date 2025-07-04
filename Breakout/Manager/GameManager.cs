@@ -47,7 +47,6 @@ namespace Breakout.Manager
 
         public void Draw()
         {
-            Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _paddle.Draw();
 
             if (!Defeat) { _ball.Draw(); }
@@ -62,7 +61,6 @@ namespace Breakout.Manager
             Globals.SpriteBatch.Draw(_lineTexture, _line[0], Color.White);
             //Globals.SpriteBatch.Draw(_lineTexture, _line[1], Color.White);
             Globals.SpriteBatch.Draw(_lineTexture, _line[2], Color.White);
-            Globals.SpriteBatch.End();
         }
 
         public void Update(GameTime gameTime)
@@ -150,7 +148,6 @@ namespace Breakout.Manager
 
         public SpriteBatch GameResult()
         {
-            var newFont = _font;
             if (_map.CheckWin(this))
             {
                 Globals.SpriteBatch.DrawString(_font, "You Win!", new Vector2(MiddleX - (MiddleX / 4) + 38, (Globals.ScreenResolution.Y / 2) + 20), Color.Green);

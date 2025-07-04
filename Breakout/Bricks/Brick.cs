@@ -25,7 +25,7 @@ namespace Breakout.Bricks
         {
             if (!Active)
             {
-                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
 
                 // Brick hitbox
                 //BrickTexture = new Texture2D(Globals.GraphicsDevice, 1, 1);

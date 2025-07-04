@@ -55,7 +55,7 @@ namespace Breakout.Manager
 
         public virtual void Draw()
         {
-            Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
         }
 
         public virtual void Update() { }

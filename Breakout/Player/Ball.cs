@@ -36,9 +36,9 @@ namespace Breakout.Player
             { 
                 // Pos X and Y += Texture divided by 2 + Ball sprite + offset (12 + 4);
                 // Now it's working 100%, for sure! :D
-                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width * SCALE, Texture.Height * SCALE), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 1f); 
+                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width * SCALE, Texture.Height * SCALE), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 0f); 
             }
-            else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f); }
+            else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f); }
         }
 
         public override void Update()
@@ -52,8 +52,10 @@ namespace Breakout.Player
             }
             else
             {
-                if (InputManager.IsKeyDown(Keys.D) && Position.X < RightSideWall - Texture.Width * SCALE) { Position.X += MoveSpeed * Globals.Time; }
-                if (InputManager.IsKeyDown(Keys.A) && Position.X > LeftSideWall) { Position.X -= MoveSpeed * Globals.Time; }
+                if (InputManager.IsKeyDown(Keys.D) || InputManager.IsKeyDown(Keys.Right)) { Position.X += MoveSpeed * Globals.Time; }
+                if (InputManager.IsKeyDown(Keys.A) || InputManager.IsKeyDown(Keys.Left)) { Position.X -= MoveSpeed * Globals.Time; }
+
+                Position = Vector2.Clamp(Position, new Vector2(LeftSideWall, 0), new Vector2(RightSideWall - Texture.Width * SCALE, (Globals.ScreenResolution.Y / 2) * 1.7f));
             }
         }
 
