@@ -10,8 +10,8 @@ namespace Breakout.Player
     {
         public float Speed = 300f;
         private readonly SoundEffect _paddleSound;
-        private readonly int HeightOffset = 12;
-        public Rectangle HitboxRectangle => new Rectangle((int)Position.X, (int)Position.Y + Texture.Height - HeightOffset / 2, Texture.Width * 2, HeightOffset);
+        private readonly int HeightOffset = 6;
+        public Rectangle HitboxRectangle => new Rectangle((int)Position.X, (int)Position.Y + Texture.Height / 2 - HeightOffset / 2, Texture.Width, HeightOffset);
 
         public Paddle(Texture2D texture, Vector2 position) : base(texture, position)
         {
@@ -37,7 +37,7 @@ namespace Breakout.Player
             // Paddle hitbox.
             //var Texture = new Texture2D(Globals.GraphicsDevice, 1, 1);
             //Texture.SetData([new Color(Color.Red, 0.1f)]);
-            //Globals.SpriteBatch.Draw(Texture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+            //Globals.SpriteBatch.Draw(Texture, HitboxRectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.2f);
         }
 
         public override void Update()
@@ -51,7 +51,7 @@ namespace Breakout.Player
                 Position.X += Speed * Globals.Time; 
             }
 
-            Position = Vector2.Clamp(Position, new Vector2(LeftSideWall, 0), new(RightSideWall - Texture.Width * SCALE, (Globals.ScreenResolution.Y / 2) * 1.7f));
+            Position = Vector2.Clamp(Position, new Vector2(LeftSideWall, 0), new(RightSideWall - Texture.Width, (Globals.ScreenResolution.Y / 2) * 1.7f));
         }
     }
 }

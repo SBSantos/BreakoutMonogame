@@ -10,10 +10,7 @@ namespace Breakout.Player
     {
         public float MoveSpeed;
         public bool Run { get; set; } = false;
-        public bool RunTimer;
-        public int Score { get; set; }
         public int Lives { get; set; }
-        public int NumberBricksBroken { get; set; }
         public Vector2 Direction;
         public float RotationSpeed { get; set; }
         private const int OFFSET = 4;
@@ -22,10 +19,7 @@ namespace Breakout.Player
         {
             Texture = Globals.Content.Load<Texture2D>("Textures/Ball");
             Position = position;
-            RunTimer = false;
-            Score = 0;
             Lives = 3;
-            NumberBricksBroken = 0;
             ResetBallDirection(Position);
         }
 
@@ -36,9 +30,9 @@ namespace Breakout.Player
             { 
                 // Pos X and Y += Texture divided by 2 + Ball sprite + offset (12 + 4);
                 // Now it's working 100%, for sure! :D
-                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width * SCALE, Texture.Height * SCALE), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 0f); 
+                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width, Texture.Height), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 0.1f); 
             }
-            else { Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f); }
+            else { Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + 16, (int)Position.Y + 16, Texture.Width, Texture.Height), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.1f); }
         }
 
         public override void Update()
@@ -55,7 +49,7 @@ namespace Breakout.Player
                 if (InputManager.IsKeyDown(Keys.D) || InputManager.IsKeyDown(Keys.Right)) { Position.X += MoveSpeed * Globals.Time; }
                 if (InputManager.IsKeyDown(Keys.A) || InputManager.IsKeyDown(Keys.Left)) { Position.X -= MoveSpeed * Globals.Time; }
 
-                Position = Vector2.Clamp(Position, new Vector2(LeftSideWall, 0), new Vector2(RightSideWall - Texture.Width * SCALE, (Globals.ScreenResolution.Y / 2) * 1.7f));
+                Position = Vector2.Clamp(Position, new Vector2(LeftSideWall - Texture.Width / 2, 0), new Vector2(RightSideWall - 48, (Globals.ScreenResolution.Y / 2) * 1.7f));
             }
         }
 
@@ -80,7 +74,7 @@ namespace Breakout.Player
             {
                 ball.Direction.X = -ball.Direction.X;
             }
-            if (ball.Position.Y < 0)
+            if (ball.Position.Y < -32)
             {
                 ball.Direction.Y = -ball.Direction.Y;
             }
@@ -88,7 +82,7 @@ namespace Breakout.Player
 
         public Rectangle CalculateBound(Vector2 pos)
         {
-            return new Rectangle((int)(pos.X + Texture.Width - OFFSET), (int)(pos.Y + Texture.Height - OFFSET), OFFSET * SCALE, OFFSET * SCALE);
+            return new Rectangle((int)(pos.X + Texture.Width - OFFSET / 2), (int)(pos.Y + Texture.Height - OFFSET / 2), OFFSET, OFFSET);
         }
 
         public bool CheckBallOutsideOfTheScreen()
@@ -99,14 +93,6 @@ namespace Breakout.Player
                 return true;
             }
             return false;
-        }
-
-        public void NewLive(Paddle paddle, GameManager gameManager)
-        {
-            Run = false;
-            paddle.Position = new(gameManager.MiddleX - gameManager.TextureOffset, (Globals.ScreenResolution.Y / 2) * 1.7f);
-            var ballYPos = paddle.Position.Y - (paddle.Texture.Height / 3) - 2;
-            ResetBallDirection(new(gameManager.MiddleX - gameManager.TextureOffset, ballYPos));
         }
 
         public bool CheckDefeat(GameManager gameManager)

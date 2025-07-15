@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Breakout.Manager;
+﻿using System.Collections.Generic;
+using System.IO;
+using Breakout.Bricks;
 using Breakout.Player;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Breakout.Bricks
+namespace Breakout.Manager
 {
     public class Map
     {
         private Texture2D _recTexture;
-        private readonly Texture2D[] _textures =
+        private readonly Texture2D[] _bricksTextures =
         {
                 Globals.Content.Load<Texture2D>("Textures/Red_Brick"),
                 Globals.Content.Load<Texture2D>("Textures/Pink_Brick"),
@@ -19,21 +19,29 @@ namespace Breakout.Bricks
                 Globals.Content.Load<Texture2D>("Textures/Green_Brick"),
                 Globals.Content.Load<Texture2D>("Textures/Yellow_Brick"),
         };
+        private readonly Texture2D _spritesheet = Globals.Content.Load<Texture2D>("Textures/Breakout_spritesheet");
         private Rectangle _newRect;
         private Point _screenSize;
         private readonly int _widthOffset = 8;
-        private readonly int _heightOffset = 16;
-        private Point _tileSize;
+        private readonly int _heightOffset = 4;
+        private readonly int _brickSpriteGap = 4;
+        private Point _brickSize;
         private Brick[,] _bricks;
+        private Point _tileSize;
+        private Dictionary<Vector2, int> _foreground;
         public HashSet<Brick> ListBrick { get; set; }
 
         public Map()
         {
-            _tileSize = new Point(32 + _widthOffset, _heightOffset);
+            _tileSize = new Point(_bricksTextures[0].Width, _bricksTextures[0].Height);
+            _brickSize = new Point(_bricksTextures[0].Width - _widthOffset - _brickSpriteGap, _bricksTextures[0].Height - _heightOffset);
             _screenSize = new Point(Globals.ScreenResolution.X / _tileSize.X, Globals.ScreenResolution.Y / _tileSize.Y);
+
             _bricks = new Brick[_screenSize.X, _screenSize.Y];
             ListBrick = new HashSet<Brick>();
             ListBricks();
+
+            _foreground = LoadMap("../../../Data/Breakout_Foreground.csv");
         }
 
         public void Draw()
@@ -44,7 +52,7 @@ namespace Breakout.Bricks
             {
                 for (int j = 0; j < _screenSize.Y; j++)
                 {
-                    if (j < 6 && i > 3 && i < 12)
+                    if (j < 6 && i > 3 && i < 24)
                     {
                         if (!_bricks[i, j].Active)
                         {
@@ -53,10 +61,11 @@ namespace Breakout.Bricks
                     }
                 }
             }
+            DrawMap();
             //Globals.SpriteBatch.Draw(_recTexture, _newRect, Color.White);
         }
-        
-        public void CheckBrickCollision(Ball ball)
+
+        public void CheckBrickCollision(Ball ball, Score score)
         {
             _newRect = ball.CalculateBound(ball.Position);
             foreach (var brick in ListBrick)
@@ -64,8 +73,7 @@ namespace Breakout.Bricks
                 if (_newRect.Intersects(brick.HitboxRectangle))
                 {
                     brick.Active = true;
-                    ball.Score++;
-                    ball.NumberBricksBroken++;
+                    score.IncreaseScore();
                     ball.Direction.Y = -ball.Direction.Y;
                     ListBrick.Remove(brick);
                 }
@@ -85,7 +93,7 @@ namespace Breakout.Bricks
             {
                 for (int j = 0; j < _screenSize.Y; j++)
                 {
-                    if (j < 6 && i > 3 && i < 12)
+                    if (j < 6 && i > 3 && i < 24)
                     {
                         switch (j)
                         {
@@ -97,10 +105,10 @@ namespace Breakout.Bricks
                             case 5: index = 5; break;
                         }
 
-                        var xpos = i * _tileSize.X - 11;
-                        var yPos = j * _tileSize.Y + 48;
+                        var xpos = i * _brickSize.X + _tileSize.X * 2 + _brickSize.X / 2;
+                        var yPos = j * _brickSize.Y + _tileSize.Y * 2;
 
-                        _bricks[i, j] = new Brick(_textures[index], new Vector2(xpos, yPos));
+                        _bricks[i, j] = new Brick(_bricksTextures[index], new Vector2(xpos, yPos));
                         ListBrick.Add(_bricks[i, j]);
                     }
                 }
@@ -114,6 +122,47 @@ namespace Breakout.Bricks
                 ListBrick.Clear();
                 ListBrick = new HashSet<Brick>();
                 ListBricks();
+            }
+        }
+
+        private Dictionary<Vector2, int> LoadMap(string path)
+        {
+            Dictionary<Vector2, int> result = new();
+
+            StreamReader reader = new(path);
+
+            int y = 0;
+            string line;
+
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] item = line.Split(',');
+                for (int x = 0; x < item.Length; x++)
+                {
+                    if (int.TryParse(item[x], out int value))
+                    {
+                        if (value > -1) { result[new Vector2(x, y)] = value; }
+                    }
+                }
+                y++;
+            }
+            return result;
+        }
+
+        public void DrawMap()
+        {
+            int tileSize = 32;
+            int tilesPerRow = 5;
+            foreach (var item in _foreground)
+            {
+                Rectangle destination = new((int)item.Key.X * tileSize, (int)item.Key.Y * tileSize, tileSize, tileSize);
+
+                int x = item.Value % tilesPerRow;
+                int y = item.Value / tilesPerRow;
+
+                Rectangle source = new(x * tileSize, y * tileSize, tileSize, tileSize);
+
+                Globals.SpriteBatch.Draw(_spritesheet, destination, source, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.2f);
             }
         }
     }

@@ -55,7 +55,7 @@ public class GameLoop : Game
         GraphicsDevice.Clear(new Color(08, 00, 35));
         Globals.GraphicsDevice.Viewport = _viewport;
 
-        Globals.SpriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _scale);
+        Globals.SpriteBatch.Begin(SpriteSortMode.FrontToBack, samplerState: SamplerState.PointClamp, transformMatrix: _scale);
         _gameManager.Draw();
         Globals.SpriteBatch.End();
 

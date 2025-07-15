@@ -19,7 +19,7 @@ namespace Breakout.Manager
         /// <summary>
         /// Rectangle of the sprite.
         /// </summary>
-        public Rectangle Rectangle => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width * SCALE, Texture.Height * SCALE);
+        public Rectangle Rectangle => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
         /// <summary>
         /// Stores the middle of the screen.
@@ -55,7 +55,7 @@ namespace Breakout.Manager
 
         public virtual void Draw()
         {
-            Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+            Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.1f);
         }
 
         public virtual void Update() { }
