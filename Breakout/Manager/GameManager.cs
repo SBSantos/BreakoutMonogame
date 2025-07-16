@@ -1,7 +1,6 @@
 ﻿using Breakout.Player;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace Breakout.Manager
 {
@@ -110,8 +109,7 @@ namespace Breakout.Manager
 
         public void ShowLives()
         {
-            int offset = 9;
-            Globals.SpriteBatch.DrawString(_font, "Lives:", new Vector2(RightX + TEXTURE_SIZE + TEXTURE_SIZE / 2, TEXTURE_SIZE + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
+            Globals.SpriteBatch.DrawString(_font, "Lives:", new Vector2(RightX + TEXTURE_SIZE + TEXTURE_SIZE / 2, TEXTURE_SIZE + TEXTURE_SIZE / 2), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
 
             for (int i = _ball.Lives; i > 0; i--)
             {
@@ -122,18 +120,18 @@ namespace Breakout.Manager
 
         public void GameResult()
         {
-            int tileRow = 9;
+            int tileRow = 7;
             int yOffset = 4;
             if (_map.CheckWin(this))
             {
                 int xOffset = 38;
-                Globals.SpriteBatch.DrawString(_font, "You Win!", new Vector2(MiddleX - (MiddleX / 4) + xOffset, TEXTURE_SIZE * tileRow - TEXTURE_SIZE / 2 + yOffset), Color.Green);
+                Globals.SpriteBatch.DrawString(_font, "You Win!", new Vector2(MiddleX - (MiddleX / 4) + xOffset, TEXTURE_SIZE * tileRow + yOffset), Color.Green, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
                 RestartMessage();
             }
             if (_ball.CheckDefeat(this))
             {
                 int xOffset = 32;
-                Globals.SpriteBatch.DrawString(_font, "You Lose!", new Vector2(MiddleX - (MiddleX / 4) + xOffset, TEXTURE_SIZE * tileRow - TEXTURE_SIZE / 2 + yOffset), Color.Red);
+                Globals.SpriteBatch.DrawString(_font, "You Lose!", new Vector2(MiddleX - (MiddleX / 4) + xOffset, TEXTURE_SIZE * tileRow + yOffset), Color.Red, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
                 RestartMessage();
             }
         }
@@ -141,9 +139,9 @@ namespace Breakout.Manager
         private void RestartMessage()
         {
             int xOffset = 18;
-            int yOffset = 16;
-            int tileRow = 9;
-            Globals.SpriteBatch.DrawString(_font, "Press R to restart the game", new Vector2(MiddleX - LeftX + xOffset, TEXTURE_SIZE * tileRow - TEXTURE_SIZE / 2 + yOffset), Color.White);
+            int yOffset = 4;
+            int tileRow = 8;
+            Globals.SpriteBatch.DrawString(_font, "Press R to restart the game", new Vector2(MiddleX - LeftX + xOffset, TEXTURE_SIZE * tileRow + yOffset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
         }
 
         public void ResetBallPaddlePosition()

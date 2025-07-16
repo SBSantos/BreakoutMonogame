@@ -28,15 +28,18 @@ namespace Breakout.Player
                 _time += Globals.Time;
                 _seconds = (float)Math.Floor(_time % 60);
                 _minutes = (float)Math.Floor(_time / 60);
-                return string.Format("   Timer:\n   {0:00}:{1:00}", _minutes, _seconds);
+                return string.Format("{0:00}:{1:00}", _minutes, _seconds);
             }
-            return string.Format("   Timer:\n   {0:00}:{1:00}", _minutes, _seconds);
+            return string.Format("{0:00}:{1:00}", _minutes, _seconds);
         }
 
         public void DrawTimer()
         {
             var textureSize = 32;
-            Globals.SpriteBatch.DrawString(_font, GameTimer(), new Vector2(textureSize / 2 + 4, (textureSize * 9) - textureSize / 2 + 4), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
+            var offset = 9;
+            int tileRow = 9;
+            Globals.SpriteBatch.DrawString(_font, "Timer:", new Vector2(textureSize + textureSize / 2, (textureSize * tileRow) - textureSize / 2), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
+            Globals.SpriteBatch.DrawString(_font, GameTimer(), new Vector2(textureSize + textureSize / 2, (textureSize * (tileRow + 1)) - textureSize / 2 - offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
         }
     }
 }

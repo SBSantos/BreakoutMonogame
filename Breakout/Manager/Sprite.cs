@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Manager
@@ -55,7 +54,7 @@ namespace Breakout.Manager
 
         public virtual void Draw()
         {
-            Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.1f);
+            Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.4f);
         }
 
         public virtual void Update() { }

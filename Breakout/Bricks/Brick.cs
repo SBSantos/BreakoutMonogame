@@ -1,5 +1,4 @@
 ﻿using Breakout.Manager;
-using Breakout.Player;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,7 +24,7 @@ namespace Breakout.Bricks
         {
             if (!Active)
             {
-                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.1f);
+                Globals.SpriteBatch.Draw(Texture, Rectangle, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.4f);
 
                 // Brick hitbox
                 //BrickTexture = new Texture2D(Globals.GraphicsDevice, 1, 1);

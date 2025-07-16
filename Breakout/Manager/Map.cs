@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Breakout.Bricks;
 using Breakout.Player;
@@ -9,7 +10,7 @@ namespace Breakout.Manager
 {
     public class Map
     {
-        private Texture2D _recTexture;
+        private Texture2D _recTexture; // To view Ball hitbox
         private readonly Texture2D[] _bricksTextures =
         {
                 Globals.Content.Load<Texture2D>("Textures/Red_Brick"),
@@ -20,14 +21,16 @@ namespace Breakout.Manager
                 Globals.Content.Load<Texture2D>("Textures/Yellow_Brick"),
         };
         private readonly Texture2D _spritesheet = Globals.Content.Load<Texture2D>("Textures/Breakout_spritesheet");
-        private Rectangle _newRect;
-        private Point _screenSize;
         private readonly int _widthOffset = 8;
         private readonly int _heightOffset = 4;
         private readonly int _brickSpriteGap = 4;
+
+        private Rectangle _newRect;
+        private Point _screenSize;
         private Point _brickSize;
-        private Brick[,] _bricks;
         private Point _tileSize;
+        private Brick[,] _bricks;
+        private Tile[,] _tiles;
         private Dictionary<Vector2, int> _foreground;
         public HashSet<Brick> ListBrick { get; set; }
 
@@ -36,6 +39,9 @@ namespace Breakout.Manager
             _tileSize = new Point(_bricksTextures[0].Width, _bricksTextures[0].Height);
             _brickSize = new Point(_bricksTextures[0].Width - _widthOffset - _brickSpriteGap, _bricksTextures[0].Height - _heightOffset);
             _screenSize = new Point(Globals.ScreenResolution.X / _tileSize.X, Globals.ScreenResolution.Y / _tileSize.Y);
+
+            _tiles = new Tile[_tileSize.X, _tileSize.Y];
+            CreateTiles();
 
             _bricks = new Brick[_screenSize.X, _screenSize.Y];
             ListBrick = new HashSet<Brick>();
@@ -59,6 +65,7 @@ namespace Breakout.Manager
                             _bricks[i, j].Draw();
                         }
                     }
+                    _tiles[i, j].Draw();
                 }
             }
             DrawMap();
@@ -151,18 +158,47 @@ namespace Breakout.Manager
 
         public void DrawMap()
         {
-            int tileSize = 32;
-            int tilesPerRow = 5;
+            Random r = new();
+            int tilesPerRow = 6;
             foreach (var item in _foreground)
             {
-                Rectangle destination = new((int)item.Key.X * tileSize, (int)item.Key.Y * tileSize, tileSize, tileSize);
+                Rectangle destination = new((int)item.Key.X * _tileSize.X, (int)item.Key.Y * _tileSize.Y, _tileSize.X, _tileSize.Y);
 
                 int x = item.Value % tilesPerRow;
                 int y = item.Value / tilesPerRow;
 
-                Rectangle source = new(x * tileSize, y * tileSize, tileSize, tileSize);
+                Rectangle source = new(x * _tileSize.X, y * _tileSize.Y, _tileSize.X, _tileSize.Y);
 
                 Globals.SpriteBatch.Draw(_spritesheet, destination, source, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.2f);
+            }
+        }
+        
+        public void CreateTiles()
+        {
+            Random r = new();
+            int tilesPerRow = 6;
+            for (int i = 0; i < _screenSize.X; i++)
+            {
+                for (int j = 0; j < _screenSize.Y; j++)
+                {
+                    var xPos = i * _tileSize.X;
+                    var yPos = j * _tileSize.Y;
+
+                    Rectangle destination = new(xPos, yPos, _tileSize.X, _tileSize.Y);
+
+                    int x;
+                    int y = r.Next(tilesPerRow) < 4 ? 4 : 5;
+
+                    switch (y) 
+                    {
+                        case 4: x = 5; break;
+                        default: x = r.Next(tilesPerRow); break;
+                    }
+
+                    Rectangle source = new(x * _tileSize.X, y * _tileSize.Y, _tileSize.X, _tileSize.Y);
+
+                    _tiles[i, j] = new(_spritesheet, destination, source, new Vector2(xPos, yPos));
+                }
             }
         }
     }

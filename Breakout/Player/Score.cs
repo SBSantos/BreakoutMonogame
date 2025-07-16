@@ -16,7 +16,7 @@ namespace Breakout.Player
 
         public string GameScore()
         {
-            return string.Format("Score:{0}", _score);
+            return string.Format("{0}", _score);
         }
 
         public void IncreaseScore()
@@ -27,9 +27,9 @@ namespace Breakout.Player
         public void DrawScore()
         {
             int textureSize = 32;
-            int yOffset = 9;
-            int xOffset = 18;
-            Globals.SpriteBatch.DrawString(_font, GameScore(), new Vector2(textureSize / 2 + xOffset, textureSize + yOffset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
+            int offset = 9;
+            Globals.SpriteBatch.DrawString(_font, "Score:", new Vector2(textureSize + textureSize / 2, textureSize + textureSize / 2), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
+            Globals.SpriteBatch.DrawString(_font, GameScore(), new Vector2(textureSize + textureSize / 2, textureSize * 2 + textureSize / 2 - offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.4f);
         }
     }
 }

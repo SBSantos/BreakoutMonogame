@@ -30,9 +30,9 @@ namespace Breakout.Player
             { 
                 // Pos X and Y += Texture divided by 2 + Ball sprite + offset (12 + 4);
                 // Now it's working 100%, for sure! :D
-                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width, Texture.Height), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 0.1f); 
+                Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + (Texture.Width / 2) + 16, (int)Position.Y + (Texture.Height / 2) + 16, Texture.Width, Texture.Height), null, Color.White, RotationSpeed, new Vector2(Texture.Width / 2, Texture.Height / 2), SpriteEffects.None, 0.4f); 
             }
-            else { Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + 16, (int)Position.Y + 16, Texture.Width, Texture.Height), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.1f); }
+            else { Globals.SpriteBatch.Draw(Texture, new Rectangle((int)Position.X + 16, (int)Position.Y + 16, Texture.Width, Texture.Height), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.4f); }
         }
 
         public override void Update()
