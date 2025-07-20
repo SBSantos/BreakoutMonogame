@@ -20,6 +20,36 @@
 /processorParam:TextureFormat=Compressed
 /build:Font/Font.spritefont
 
+#begin Sounds/Brick_Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Brick_Sound.wav
+
+#begin Sounds/Life_Lost_Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Life_Lost_Sound.wav
+
+#begin Sounds/Paddle_Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Paddle_Sound.wav
+
+#begin Sounds/Victory.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Victory.wav
+
+#begin Sounds/Wall_Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Wall_Sound.wav
+
 #begin Textures/Ball.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -67,18 +97,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Cyan_Brick.png
-
-#begin Textures/DebugSquareSprite32x32.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/DebugSquareSprite32x32.png
 
 #begin Textures/Green_Brick.png
 /importer:TextureImporter

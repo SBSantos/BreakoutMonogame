@@ -4,6 +4,7 @@ using System.IO;
 using Breakout.Bricks;
 using Breakout.Player;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Manager
@@ -80,6 +81,7 @@ namespace Breakout.Manager
                 if (_newRect.Intersects(brick.HitboxRectangle))
                 {
                     brick.Active = true;
+                    brick.BrickSound.Play();
                     score.IncreaseScore();
                     ball.Direction.Y = -ball.Direction.Y;
                     ListBrick.Remove(brick);
@@ -89,7 +91,10 @@ namespace Breakout.Manager
 
         public bool CheckWin(GameManager gameManager)
         {
-            if (ListBrick.Count == 0) { return gameManager.Victory = true; }
+            if (ListBrick.Count == 0) 
+            {
+                return gameManager.Victory = true; 
+            }
             return false;
         }
 

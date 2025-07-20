@@ -1,5 +1,7 @@
-﻿using Breakout.Player;
+﻿using System.Collections.Generic;
+using Breakout.Player;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Breakout.Manager
@@ -7,13 +9,15 @@ namespace Breakout.Manager
     public class GameManager
     {
         private readonly Paddle _paddle;
-        private readonly Ball _ball;
         private readonly Map _map;
         private readonly SpriteFont _font;
+        private readonly SoundManager _soundManager;
+        private Ball _ball;
         private Score _score;
         private Timer _timer;
         public bool Victory;
         public bool Defeat;
+        public bool Playing;
 
         public const int TEXTURE_SIZE = 32;
 
@@ -29,13 +33,15 @@ namespace Breakout.Manager
 
             _paddle = new(Texture, new Vector2(MiddleX - TEXTURE_SIZE / 2, (Globals.ScreenResolution.Y / 2) * 1.7f));
 
-            var ballYPos = _paddle.Position.Y - _paddle.Texture.Height / 2 - 7;
-            _ball = new(Texture, new Vector2(MiddleX - TEXTURE_SIZE, ballYPos));
+            _ball = new(Texture, new Vector2(MiddleX - TEXTURE_SIZE, BallYPosition()));
 
             _font = Globals.Content.Load<SpriteFont>("Font/Font");
 
             _score = new(_font);
             _timer = new(_font);
+
+            _soundManager = new(Globals.Content.Load<SoundEffect>("Sounds/Victory"));
+            Playing = true;
 
             Victory = false;
             Defeat = false;
@@ -61,9 +67,8 @@ namespace Breakout.Manager
 
             InputManager.Update();
             _paddle.Update();
-
             _ball.Update();
-            _ball.CheckWallCollision(_ball);
+            _ball.FirstPaddleSound(_paddle);
 
             _paddle.CheckPaddleBallCollision(_ball);
 
@@ -76,7 +81,7 @@ namespace Breakout.Manager
                 _ball.Run = true;
                 _timer.Run = true;
             }
-            else { _ball.MoveSpeed = 300f; }
+            //else { _ball.MoveSpeed = 300f; }
 
             if (_map.CheckWin(this) || _ball.CheckDefeat(this))
             {
@@ -89,20 +94,22 @@ namespace Breakout.Manager
 
                 if (InputManager.RPressed) { Reset(); }
             }
+
+            PlayVictorySound();
         }
 
         public void Reset()
         {
             ResetBallPaddlePosition();
-            _paddle.Speed = 300f;
-            _ball.MoveSpeed = 300f;
-            _ball.Lives = 3;
+            _ball = new(Texture, new Vector2(MiddleX - TEXTURE_SIZE, BallYPosition()));
 
             _timer = new(_font);
             _score = new(_font);
 
             Victory = false;
             Defeat = false;
+
+            Playing = true;
 
             _map.ResetBrick();
         }
@@ -146,10 +153,25 @@ namespace Breakout.Manager
 
         public void ResetBallPaddlePosition()
         {
+            _ball.ResetBallDirection(new(MiddleX - TEXTURE_SIZE, BallYPosition()));
             _ball.Run = false;
             _paddle.Position = new(MiddleX - TEXTURE_SIZE / 2, (Globals.ScreenResolution.Y / 2) * 1.7f);
-            var ballYPos = _paddle.Position.Y - _paddle.Texture.Height / 2 - 7;
-            _ball.ResetBallDirection(new(MiddleX - TEXTURE_SIZE, ballYPos));
+            _paddle.Speed = 300f;
+            _paddle.Playing = true;
+        }
+
+        private float BallYPosition()
+        {
+            return _paddle.Position.Y - _paddle.Texture.Height / 2 - 7;
+        }
+
+        public void PlayVictorySound()
+        {
+            if (Victory && Playing) 
+            {
+                _soundManager.PlaySound();
+                Playing = false;
+            }
         }
     }
 }

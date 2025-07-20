@@ -9,7 +9,8 @@ namespace Breakout.Player
     public class Paddle : Sprite, IHitable
     {
         public float Speed = 300f;
-        private readonly SoundEffect _paddleSound;
+        public bool Playing;
+        public readonly SoundManager SoundManager;
         private readonly int HeightOffset = 6;
         public Rectangle HitboxRectangle => new Rectangle((int)Position.X, (int)Position.Y + Texture.Height / 2 - HeightOffset / 2, Texture.Width, HeightOffset);
 
@@ -17,7 +18,8 @@ namespace Breakout.Player
         {
             Texture = Globals.Content.Load<Texture2D>("Textures/Paddle");
             Position = position;
-            //_paddleSound = Globals.Content.Load<SoundEffect>("Paddle_Sound");
+            Playing = true;
+            SoundManager = new(Globals.Content.Load<SoundEffect>("Sounds/Paddle_Sound"));
         }
         
         public void CheckPaddleBallCollision(Ball ball)
@@ -25,7 +27,7 @@ namespace Breakout.Player
             var newRect = ball.CalculateBound(ball.Position);
             if (newRect.Intersects(HitboxRectangle))
             {
-                //_paddleSound.Play();
+                SoundManager.PlaySound();
                 ball.Direction.Y = -ball.Direction.Y;
             }
         }

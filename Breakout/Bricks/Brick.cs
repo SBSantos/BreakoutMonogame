@@ -8,16 +8,18 @@ namespace Breakout.Bricks
     public class Brick : Sprite, IHitable
     {
         public Texture2D BrickTexture;
-        public bool Active { get; set; } = false;
+        public readonly SoundEffect BrickSound;
         private readonly int _widthOffset = 20;
         private readonly int _heightOffset = 8;
+
+        public bool Active { get; set; } = false;
         public Rectangle HitboxRectangle => new Rectangle((int)(Position.X + _widthOffset / 3), (int)(Position.Y + Texture.Height / 2 - _heightOffset / 2), _widthOffset, _heightOffset);
-        private SoundEffect _brickSound;
 
         public Brick(Texture2D texture, Vector2 position) : base(texture, position)
         {
             Texture = texture;
             Position = position;
+            BrickSound = Globals.Content.Load<SoundEffect>("Sounds/Brick_Sound");
         }
 
         public override void Draw()
